@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import sweetvis as sv
+import sweetviz as sv
+from streamlit.components.v1 import html
 
 st.set_page_config(page_title="EDA App", layout="wide")
 
@@ -34,45 +35,15 @@ if uploaded_file is not None:
     missing = df.isnull().sum()
     st.dataframe(missing)
 
-    # Bar graph for missing values
-    st.subheader("📉 Missing Values Bar Chart")
-    fig, ax = plt.subplots()
-    missing.plot(kind='bar', ax=ax)
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
+    # Sweetviz Report
+    st.subheader("📊 Sweetviz Report")
 
-    # Select column for visualization
-    st.subheader("📊 Column Visualization")
-    numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+    if st.button("Generate Sweetviz Report"):
+        report = sv.analyze(df)
+        report_path = "sweetviz_report.html"
+        report.show_html(report_path)
 
-    if numeric_cols:
-        selected_col = st.selectbox("Select a numeric column", numeric_cols)
+        with open(report_path, 'r', encoding='utf-8') as f:
+            html_content = f.read()
 
-        fig2, ax2 = plt.subplots()
-        sns.histplot(df[selected_col], kde=True, ax=ax2)
-        st.pyplot(fig2)
-
-    # Bar chart for categorical data
-    categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
-
-    if categorical_cols:
-        st.subheader("📊 Categorical Bar Chart")
-        selected_cat = st.selectbox("Select a categorical column", categorical_cols)
-
-        fig3, ax3 = plt.subplots()
-        df[selected_cat].value_counts().plot(kind='bar', ax=ax3)
-        plt.xticks(rotation=45)
-        st.pyplot(fig3)
-
-    # Optional: Profiling report
-    if st.checkbox("Generate Profiling Report (can be slow)"):
-        from ydata_profiling import ProfileReport
-        from streamlit.components.v1 import components
-
-       
-        
-
-        with open("report.html", "r", encoding="utf-8") as f:
-            html = f.read()
-
-        components.html(html, height=800, scrolling=True)
+        html(html_content, height=1000, scrolling=True)
