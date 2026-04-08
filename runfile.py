@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import sweetvis as sv
 
 st.set_page_config(page_title="EDA App", layout="wide")
 
@@ -70,8 +69,8 @@ if uploaded_file is not None:
         from ydata_profiling import ProfileReport
         from streamlit.components.v1 import components
 
-        profile = ProfileReport(df, explorative=True)
-        profile.to_file("report.html")
+       
+        
 
         with open("report.html", "r", encoding="utf-8") as f:
             html = f.read()
